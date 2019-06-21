@@ -98,6 +98,8 @@ class EventStream
     eventStreamSource.addEventListener("ObservationRemoved", this._wrapEventHandler(this.onObservationRemoved.bind(this)));
 
 
+    this._possessionStates = [];
+
     this.currentState = {
       possession: null,
       period: null
@@ -110,6 +112,29 @@ class EventStream
         eventStreamSource.stop();
       }
     });
+  }
+
+  _updatePossession()
+  {
+    this.currentState.possession = this._possessionStates[this._possessionStates.length - 1].state;
+  }
+
+  pushPossessionState(id, state)
+  {
+    this._possessionStates.push({id, state});
+    this._updatePossession();
+  }
+
+  _popPossiblePossessionState(id)
+  {
+    if (!this._possessionStates.length > 0) {
+      return;
+    }
+
+    if (this._possessionStates[this._possessionStates.length - 1].id === id) {
+      this._possessionStates.pop();
+      this._updatePossession();
+    }
   }
 
   relativeTime(time)
@@ -183,11 +208,11 @@ class EventStream
   {
     this._endPossession(time);
 
-    this.currentState.possession = {
+    this.pushPossessionState(id, {
       startTime: this.relativeTime(time),
       id,
       ...attributes
-    };
+    });
 
     this._trigger(
       "startPossession",
@@ -235,6 +260,8 @@ class EventStream
   }
 
   onObservationRemoved({id}) {
+    this._popPossiblePossessionState(id);
+
     this._trigger(
       "observationRemoved",
       {
