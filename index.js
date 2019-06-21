@@ -90,6 +90,8 @@ class EventStream
     eventStreamSource.addEventListener("PenaltyGiven", this._createEventHandler("penaltyGiven"));
 
     eventStreamSource.addEventListener("StartPossession", this._wrapEventHandler(this._onStartPossession.bind(this)));
+
+    eventStreamSource.addEventListener("SportingEventCreated", this._wrapEventHandler(this.onSportingEventCreated.bind(this)));
     eventStreamSource.addEventListener("EndPeriod", this._wrapEventHandler(this.onEndPeriod.bind(this)));
     eventStreamSource.addEventListener("StartPeriod", this._wrapEventHandler(this.onStartPeriod.bind(this)));
 
@@ -214,6 +216,18 @@ class EventStream
       "startPeriod",
       {
         period
+      }
+    )
+  }
+
+  onSportingEventCreated({name, homeTeam, awayTeam, scheduledAt})
+  {
+    this._trigger(
+      "sportingEventCreated",
+      {
+        name,
+        homeTeam, awayTeam,
+        scheduledAt
       }
     )
   }
