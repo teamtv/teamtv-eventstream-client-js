@@ -95,6 +95,8 @@ class EventStream
     eventStreamSource.addEventListener("EndPeriod", this._wrapEventHandler(this.onEndPeriod.bind(this)));
     eventStreamSource.addEventListener("StartPeriod", this._wrapEventHandler(this.onStartPeriod.bind(this)));
 
+    eventStreamSource.addEventListener("ObservationRemoved", this._wrapEventHandler(this.onObservationRemoved.bind(this)));
+
 
     this.currentState = {
       possession: null,
@@ -230,6 +232,15 @@ class EventStream
         scheduledAt
       }
     )
+  }
+
+  onObservationRemoved({id}) {
+    this._trigger(
+      "observationRemoved",
+      {
+        id
+      }
+    );
   }
 }
 
