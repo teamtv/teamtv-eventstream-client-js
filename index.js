@@ -220,29 +220,32 @@ class EventStream
     );
   }
 
-  onEndPeriod({clockId, time, period})
+  onEndPeriod({clockId, time, period}, description, occurredOn)
   {
     this._endPossession();
 
     this._trigger(
       "endPeriod",
       {
-        period
+        period,
+        occurredOn
       }
     )
   }
 
-  onStartPeriod({clockId, time, period})
+  onStartPeriod({clockId, time, period}, description, occurredOn)
   {
     this.currentState.period = {
       time: time,
-      period
+      period,
+      occurredOn
     };
 
     this._trigger(
       "startPeriod",
       {
-        period
+        period,
+        occurredOn
       }
     )
   }
