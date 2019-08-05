@@ -116,7 +116,11 @@ class EventStream
 
   _updatePossession()
   {
-    this.currentState.possession = this._possessionStates[this._possessionStates.length - 1].state;
+    if (this._possessionStates.length === 0) {
+      this.currentState.possession = null;
+    } else {
+      this.currentState.possession = this._possessionStates[this._possessionStates.length - 1].state;
+    }
   }
 
   pushPossessionState(id, state)
@@ -127,7 +131,7 @@ class EventStream
 
   _popPossiblePossessionState(id)
   {
-    if (!this._possessionStates.length > 0) {
+    if (this._possessionStates.length === 0) {
       return;
     }
 
