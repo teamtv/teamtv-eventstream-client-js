@@ -34,7 +34,12 @@ class PollingEventStreamSource
 
     xmlHttp.onload = () => {
       const events = JSON.parse(xmlHttp.responseText);
-      this._processEvents(events);
+      let serverTime = (new Date(xmlHttp.getResponseHeader('date'))) / 1000;
+      const age = xmlHttp.getResponseHeader('age');
+      if (!!age) {
+        serverTime += parseInt(age);
+      }
+      this._processEvents(events, serverTime);
     };
 
     xmlHttp.open( "GET", url, true );
@@ -49,7 +54,7 @@ class PollingEventStreamSource
     this.eventHandlers[eventName].push(handler);
   }
 
-  _processEvents(events)
+  _processEvents(events, timestamp)
   {
     for(const event of events)
     {
@@ -60,7 +65,8 @@ class PollingEventStreamSource
               eventAttributes: event.event_attributes,
               occurredOn: event.occured_on,
               description: undefined
-            }
+            },
+            timestamp: timestamp
           });
         }
       }
@@ -80,7 +86,7 @@ class PollingEventStreamSource
 
 class EventStream
 {
-  constructor(eventStreamSource)
+  constructor(eventStreamSource, periodCount=2)
   {
 
     eventStreamSource.addEventListener("Shot", this._createEventHandler("shot"));
@@ -108,7 +114,7 @@ class EventStream
     this._eventHandlers = {};
 
     this.on('endPeriod', ({period}) => {
-      if (parseInt(period) === 2) {
+      if (parseInt(period) === periodCount) {
         eventStreamSource.stop();
       }
     });
@@ -158,29 +164,29 @@ class EventStream
     this._eventHandlers[eventName].push(callback);
   }
 
-  _trigger(eventName, attributes)
+  _trigger(eventName, attributes, timestamp)
   {
     if (typeof this._eventHandlers[eventName] !== "undefined")
     {
       for(const callback of this._eventHandlers[eventName])
       {
-        callback(attributes);
+        callback(attributes, timestamp);
       }
     }
   }
 
   _wrapEventHandler(fn)
   {
-    return ({data}) => {
+    return ({data, timestamp}) => {
       const {eventAttributes, description, occurredOn} = typeof data === "string" ? JSON.parse(data) : data;
-      fn(eventAttributes, description, occurredOn);
+      fn(eventAttributes, description, occurredOn, timestamp);
     };
   }
 
   _createEventHandler(eventName)
   {
     return this._wrapEventHandler(
-      ({id, time, [`${eventName}Attributes`]: attributes, description}) => {
+      ({id, time, [`${eventName}Attributes`]: attributes, description}, description_, occurredOn, timestamp) => {
         this._trigger(
           eventName,
           {
@@ -188,7 +194,8 @@ class EventStream
             id, description,
             ...attributes,
             possession: this.currentState.possession
-          }
+          },
+          timestamp
         );
       }
     );

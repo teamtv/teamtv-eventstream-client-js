@@ -1,6 +1,6 @@
 {
   "name": "@teamtv/eventstream-client",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Client to the teamtv match realtime eventstream API",
   "main": "index.js",
   "scripts": {
