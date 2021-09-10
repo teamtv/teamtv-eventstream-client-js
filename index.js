@@ -17,9 +17,10 @@ class SSEEventStreamSource
 
 class PollingEventStreamSource
 {
-  constructor(endpointUrl)
+  constructor(endpointUrl, interval)
   {
     this.endPointUrl = endpointUrl;
+    this.interval = interval;
     this.lastEventId = null;
     this.eventHandlers = {};
     this.start();
@@ -76,7 +77,7 @@ class PollingEventStreamSource
 
   start() {
     this.fetch();
-    this._interval = setInterval(() => this.fetch(), 5000);
+    this._interval = setInterval(() => this.fetch(), this.interval * 1000);
   }
 
   stop() {
