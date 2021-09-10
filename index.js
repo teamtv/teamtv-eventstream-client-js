@@ -63,7 +63,7 @@ class PollingEventStreamSource
           eventHandler({
             data: {
               eventAttributes: event.event_attributes,
-              occurredOn: event.occured_on,
+              occurredOn: event.occurred_on,
               description: undefined
             },
             timestamp: timestamp
