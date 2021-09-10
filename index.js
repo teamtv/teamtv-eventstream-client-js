@@ -215,7 +215,7 @@ class EventStream
     }
   }
 
-  _onStartPossession({id, time, startPossessionAttributes: attributes})
+  _onStartPossession({id, time, startPossessionAttributes: attributes}, description, occurredOn, timestamp)
   {
     this._endPossession(time);
 
@@ -227,11 +227,12 @@ class EventStream
 
     this._trigger(
       "startPossession",
-      this.currentState.possession
+      this.currentState.possession,
+        timestamp
     );
   }
 
-  onEndPeriod({clockId, time, period}, description, occurredOn)
+  onEndPeriod({clockId, time, period}, description, occurredOn, timestamp)
   {
     this._endPossession();
 
@@ -240,11 +241,12 @@ class EventStream
       {
         period,
         occurredOn
-      }
+      },
+        timestamp
     )
   }
 
-  onStartPeriod({clockId, time, period}, description, occurredOn)
+  onStartPeriod({clockId, time, period}, description, occurredOn, timestamp)
   {
     this.currentState.period = {
       time: time,
@@ -257,11 +259,12 @@ class EventStream
       {
         period,
         occurredOn
-      }
+      },
+        timestamp
     )
   }
 
-  onSportingEventCreated({name, homeTeam, awayTeam, scheduledAt})
+  onSportingEventCreated({name, homeTeam, awayTeam, scheduledAt}, description, occurredOn, timestamp)
   {
     this._trigger(
       "sportingEventCreated",
@@ -269,18 +272,20 @@ class EventStream
         name,
         homeTeam, awayTeam,
         scheduledAt
-      }
+      },
+        timestamp
     )
   }
 
-  onObservationRemoved({id}) {
+  onObservationRemoved({id}, description, occurredOn, timestamp) {
     this._popPossiblePossessionState(id);
 
     this._trigger(
       "observationRemoved",
       {
         id
-      }
+      },
+        timestamp
     );
   }
 }
