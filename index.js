@@ -91,6 +91,7 @@ class EventStream
   {
 
     eventStreamSource.addEventListener("Shot", this._createEventHandler("shot"));
+    eventStreamSource.addEventListener("Goal", this._createEventHandler("goal"));
     eventStreamSource.addEventListener("BallLoss", this._createEventHandler("ballLoss"));
     eventStreamSource.addEventListener("Substitution", this._createEventHandler("substitution"));
     eventStreamSource.addEventListener("GoalCorrection", this._createEventHandler("goalCorrection"));
